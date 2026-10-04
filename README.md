@@ -36,6 +36,7 @@ This branch is set up to be safe to share as a cold-outreach demo:
 - A large **"Demo site" banner** is fixed at the top of every page, with the expiry date.
 - **Auto-expiry:** after `DEMO_EXPIRES` (default `2026-11-03`, end of day New York time), every page returns a "This demo has expired" page (HTTP 410).
 - `noindex, nofollow` keeps search engines from indexing the demo.
+- **Password gate:** until a visitor unlocks, the server sends only a blurred preview (banner, header and hero) under an "Unlock the demo now !!!" popup that can't be closed. Every other page, image and API returns 401. Correct credentials set a signed, HttpOnly cookie for 7 days. Only a scrypt hash of the password is stored in code; `DEMO_USER` / `DEMO_PASS` override it. Failed attempts are rate-limited (10 per 15 minutes per IP).
 - YouTube videos are embedded through YouTube's own player, which YouTube's terms allow. Videos featuring public figures are filtered out.
 
 ## Structure

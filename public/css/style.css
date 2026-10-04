@@ -530,3 +530,22 @@ p { margin: 0 0 1em; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
   .reveal { opacity: 1; transform: none; }
 }
+
+/* ---------- access gate (locked demo) ---------- */
+.gate { position: fixed; inset: 0; z-index: 100; display: grid; place-items: center; padding: 16px;
+  background: rgba(20,17,14,.45); backdrop-filter: blur(14px) saturate(1.1); -webkit-backdrop-filter: blur(14px) saturate(1.1); }
+body:has(.gate) { overflow: hidden; }
+.gate-card { width: min(440px, 100%); background: var(--ivory); color: var(--text); border-radius: 24px; padding: clamp(28px, 5vw, 40px);
+  box-shadow: 0 50px 100px -30px rgba(0,0,0,.7); border: 1px solid rgba(216,187,138,.5); animation: pop .5s var(--ease); }
+.gate-lock { width: 52px; height: 52px; border-radius: 50%; display: grid; place-items: center; margin-bottom: 18px;
+  background: linear-gradient(135deg, var(--gold-3), var(--gold-2)); color: var(--ink); }
+.gate-lock svg { width: 24px; height: 24px; }
+.gate-card h2 { font-size: clamp(2rem, 6vw, 2.6rem); margin-bottom: 10px; }
+.gate-card > p { color: var(--muted); font-size: .92rem; margin-bottom: 22px; }
+.gate-card label { display: block; font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 700; color: var(--muted); margin: 0 0 6px; }
+.gate-card input { width: 100%; font: inherit; font-size: 16px; padding: 13px 16px; border-radius: 12px; border: 1px solid var(--line); background: #fff; margin-bottom: 16px; outline: none; transition: border-color .25s; }
+.gate-card input:focus { border-color: var(--gold); }
+.gate-card .btn { margin-top: 6px; }
+.gate-msg { min-height: 1.4em; margin: 12px 0 0 !important; font-size: .88rem; color: #b5523b !important; text-align: center; }
+.gate-card.shake { animation: shake .45s; }
+@keyframes shake { 20%, 60% { transform: translateX(-8px); } 40%, 80% { transform: translateX(8px); } }

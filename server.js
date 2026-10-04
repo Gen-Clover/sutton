@@ -10,6 +10,8 @@
 //   ANTHROPIC_API_KEY      enables the Claude-backed AI concierge
 //   BLOG_LIVE=1            pull posts from the practice's WordPress (off by default in the demo)
 //   DEMO_EXPIRES           YYYY-MM-DD; after this date the site shows an "expired" page
+//   DEMO_USER / DEMO_PASS  override the demo login (default user sutton@demo.com)
+//   SESSION_SECRET         optional; signs the unlock cookie
 
 import http from "node:http";
 import fs from "node:fs";
@@ -17,6 +19,7 @@ import fsp from "node:fs/promises";
 import path from "node:path";
 import zlib from "node:zlib";
 import { fileURLToPath } from "node:url";
+import crypto from "node:crypto";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(ROOT, "public");
@@ -350,6 +353,95 @@ const EXPIRED_PAGE = `<!doctype html><html lang="en"><head><meta charset="utf-8"
 h1{font:400 2.4rem Georgia,serif;margin:0 0 12px}p{color:rgba(246,242,235,.65);max-width:460px;margin:0 auto}span{color:#d8bb8a}</style></head>
 <body><div><h1>This demo has <span>expired</span></h1><p>This was a temporary concept preview and is no longer available. It was never the official website of Sutton Advanced Cosmetic Dentistry.</p></div></body></html>`;
 
+// ---------- access gate ----------
+// The whole site sits behind one demo login. Until unlocked, "/" serves a
+// stripped preview (banner + header + hero) under a blocking popup, and every
+// other page, asset and API returns 401. Only a scrypt hash of the password is
+// kept here; DEMO_USER / DEMO_PASS env vars override the defaults.
+const GATE_USER = (process.env.DEMO_USER || "sutton@demo.com").toLowerCase();
+const GATE_SALT = "sutton-demo-gate-v1";
+const GATE_HASH = process.env.DEMO_PASS
+  ? crypto.scryptSync(process.env.DEMO_PASS, GATE_SALT, 32)
+  : Buffer.from("a88e9076a08bf6580120c874812bf7c3819af1c05545461af9e43aa1d88d2b6b", "hex");
+const SESSION_SECRET = process.env.SESSION_SECRET || crypto.createHash("sha256").update("session:" + GATE_HASH.toString("hex")).digest();
+const SESSION_DAYS = 7;
+const COOKIE = "sutton_demo";
+// assets the locked preview needs; everything else requires a session
+const GATE_PUBLIC = new Set(["/css/style.css", "/img/favicon.svg", "/img/demo/hero-nyc.webp", "/api/unlock"]);
+
+const sign = (v) => crypto.createHmac("sha256", SESSION_SECRET).update(v).digest("base64url");
+function hasSession(req) {
+  const raw = (req.headers.cookie || "").split(/;\s*/).find((c) => c.startsWith(COOKIE + "="));
+  if (!raw) return false;
+  const [exp, mac] = raw.slice(COOKIE.length + 1).split(".");
+  if (!exp || !mac || Number(exp) < Date.now()) return false;
+  const a = Buffer.from(mac), b = Buffer.from(sign(exp));
+  return a.length === b.length && crypto.timingSafeEqual(a, b);
+}
+function checkCredentials(email, password) {
+  const userOk = String(email || "").trim().toLowerCase() === GATE_USER;
+  const passOk = crypto.timingSafeEqual(crypto.scryptSync(String(password || ""), GATE_SALT, 32), GATE_HASH);
+  return userOk && passOk;
+}
+const attempts = new Map(); // ip -> {n, reset}
+function rateLimited(ip) {
+  const now = Date.now(), a = attempts.get(ip);
+  if (!a || a.reset < now) { attempts.set(ip, { n: 1, reset: now + 15 * 60_000 }); return false; }
+  return ++a.n > 10;
+}
+async function unlock(req, res) {
+  const ip = req.socket.remoteAddress || "?";
+  if (rateLimited(ip)) return json(req, res, 429, { error: "Too many attempts. Please try again in 15 minutes." });
+  const { email, password } = await readBody(req);
+  if (!checkCredentials(email, password)) return json(req, res, 401, { error: "Incorrect email or password." });
+  attempts.delete(ip);
+  const exp = String(Date.now() + SESSION_DAYS * 864e5);
+  const secure = req.headers["x-forwarded-proto"] === "https" ? "; Secure" : "";
+  res.setHeader("Set-Cookie", `${COOKIE}=${exp}.${sign(exp)}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${SESSION_DAYS * 86400}${secure}`);
+  return json(req, res, 200, { ok: true });
+}
+
+// Locked preview: the real header + hero (blurred), no app script, plus the unlock popup.
+async function gatePage() {
+  const html = await fsp.readFile(path.join(PUBLIC, "index.html"), "utf8");
+  const cut = html.indexOf("<!-- ================= CELEB MARQUEE");
+  return html.slice(0, cut) + `</main>
+<div class="gate" role="dialog" aria-modal="true" aria-labelledby="gateTitle">
+  <form class="gate-card" id="gateForm" novalidate>
+    <span class="gate-lock" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="M8 10V7a4 4 0 0 1 8 0v3" fill="none" stroke="currentColor" stroke-width="1.7"/></svg></span>
+    <h2 id="gateTitle">Unlock the demo <em>now</em>&nbsp;!!!</h2>
+    <p>This private concept preview for Sutton Advanced Cosmetic Dentistry is password-protected. Enter the access details from your email.</p>
+    <label for="gEmail">Email</label>
+    <input id="gEmail" name="email" type="email" autocomplete="username" required autofocus>
+    <label for="gPass">Password</label>
+    <input id="gPass" name="password" type="password" autocomplete="current-password" required>
+    <button class="btn btn-gold btn-block" type="submit">Unlock the demo</button>
+    <p class="gate-msg" id="gateMsg" role="alert"></p>
+  </form>
+</div>
+<script>
+  document.querySelectorAll(".reveal").forEach((el) => el.classList.add("in"));
+  document.documentElement.style.setProperty("--bh", document.getElementById("demoBanner").offsetHeight + "px");
+  const f = document.getElementById("gateForm"), msg = document.getElementById("gateMsg");
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") e.preventDefault(); });
+  f.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const btn = f.querySelector("button"); btn.disabled = true; msg.textContent = "Checking…";
+    try {
+      const r = await fetch("/api/unlock", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: f.email.value, password: f.password.value }) });
+      const d = await r.json();
+      if (r.ok) { msg.textContent = "Unlocked. Loading…"; location.reload(); return; }
+      msg.textContent = d.error || "Incorrect email or password.";
+      f.classList.remove("shake"); void f.offsetWidth; f.classList.add("shake");
+      f.password.select();
+    } catch { msg.textContent = "Connection problem. Please try again."; }
+    btn.disabled = false;
+  });
+</script>
+</body>
+</html>`;
+}
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://localhost");
   if (isExpired()) {
@@ -357,6 +449,14 @@ const server = http.createServer(async (req, res) => {
     return send(req, res, 410, EXPIRED_PAGE, MIME[".html"], { "Cache-Control": "no-store" });
   }
   try {
+    if (url.pathname === "/api/unlock" && req.method === "POST") return await unlock(req, res);
+    if (!hasSession(req) && !GATE_PUBLIC.has(url.pathname)) {
+      if (url.pathname === "/" || url.pathname === "/index.html") {
+        return send(req, res, 200, await gatePage(), MIME[".html"], { "Cache-Control": "no-store", compress: true });
+      }
+      if (url.pathname.startsWith("/api/")) return json(req, res, 401, { error: "locked" });
+      return send(req, res, 401, "Locked demo", "text/plain", { "Cache-Control": "no-store" });
+    }
     if (url.pathname.startsWith("/api/")) {
       if (req.method === "GET") {
         const routes = { "/api/youtube": getYouTube, "/api/instagram": getInstagram, "/api/reviews": getReviews, "/api/blog": getBlog };
