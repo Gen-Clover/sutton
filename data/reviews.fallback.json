@@ -1,17 +1,14 @@
 {
-  "source": "fallback",
+  "source": "demo",
   "rating": 4.9,
   "total": 236,
   "profileUrl": "https://www.google.com/maps/search/?api=1&query=Sutton+Advanced+Cosmetic+Dentistry+400+East+56th+St+New+York",
   "reviews": [
-    { "author": "Taylor Dreitlein", "rating": 5, "when": "Google", "text": "I have been seeing Dr. Sheila for 3 years now and her + the entire Sutton Advanced Cosmetic Dentistry staff have been the absolute best! My veneers turned out so beautiful and natural and I am extremely happy with the condition of my teeth." },
-    { "author": "Zach A", "rating": 5, "when": "Google", "text": "My dentist for life. Amazing practice, great location and space, technically skilled, and most importantly the best and most assuring dispositions. I would literally never go anywhere else. A+++" },
-    { "author": "Anna Chen", "rating": 5, "when": "Google", "text": "Five stars – and were it possible, I'd add a sixth. After two other dentists told me I would probably need about ten visits and multiple tooth removals, Dr. Fajiram calmly and patiently described that much of what I had been told was definitely not necessary." },
-    { "author": "Ronit Delrahim", "rating": 5, "when": "Google", "text": "I have always hated my smile for as long as I can remember. As a child, I chipped my front teeth in a bad accident. Dr Sheila changed that for me this year! I went from a wrecked smile to a celebrity smile." },
-    { "author": "Nadia Arabian", "rating": 5, "when": "Google", "text": "Dr. Fajiram is a professional, educated, kind, experienced and patient. She made sure that my veneers were perfect and comfortable. I'm obsessed with the color and look of my smile." },
-    { "author": "Samantha Tiran", "rating": 5, "when": "Google", "text": "Sutton Advanced is the best! It is precision care and such great personal attention. The staff is so helpful and you are always treated with respect and care." },
-    { "author": "Indra Teka", "rating": 5, "when": "Google", "text": "I found Dr. Fajiram and Dr. Monahemi through Instagram. I initially went in for a consultation for my husband and ended his visit with one for myself. The staff was amazing and made us feel very welcomed." },
-    { "author": "Onyx Opus", "rating": 5, "when": "Google", "text": "I had beautiful & natural veneers done with Dr. Sheila. She removed the old ones, took care of a cavity that was forming and made my teeth look amazing. She was wonderful from beginning to end." },
-    { "author": "Matteo Prodani", "rating": 5, "when": "Google", "text": "Great service and great attitude. Everyone is knowledgeable and happy to assist. Beautiful space and perfect location." }
+    { "author": "Sample Patient A.", "rating": 5, "when": "Demo review", "text": "From the first consultation I felt completely at ease. My veneers look natural, as if I was born with this smile." },
+    { "author": "Sample Patient B.", "rating": 5, "when": "Demo review", "text": "Beautiful, calm office and a team that explains every step. The same-day crown was done before lunch." },
+    { "author": "Sample Patient C.", "rating": 5, "when": "Demo review", "text": "I was nervous about dentists for years. This was genuinely pain-free, and I actually look forward to my visits now." },
+    { "author": "Sample Patient D.", "rating": 5, "when": "Demo review", "text": "They designed my smile around my face, not a one-size-fits-all set of teeth. Subtle, bright and very me." },
+    { "author": "Sample Patient E.", "rating": 5, "when": "Demo review", "text": "Flew in from out of state and the whole plan was handled in very few visits thanks to their on-site lab." },
+    { "author": "Sample Patient F.", "rating": 5, "when": "Demo review", "text": "Professional, warm and incredibly detailed. Worth every minute. I recommend them to everyone who asks about my smile." }
   ]
 }

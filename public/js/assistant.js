@@ -59,7 +59,7 @@ const INTENTS = [
   { id: "location", re: /\b(where|address|location|located|directions|parking|subway|train|map|find you)\b/ },
   { id: "hours", re: /\b(hours|open|close|closing|weekend|saturday|sunday|today|tonight|after hours)\b/ },
   { id: "doctors", re: /\b(doctor|doctors|dentist|dr\.?|fajiram|monahemi|sheila|mojgan|who (will|is))\b/ },
-  { id: "celeb", re: /\b(celeb|celebrity|celebrities|famous|nicki|fat joe|idris|shania|star)\b/ },
+  { id: "celeb", re: /\b(celeb|celebrity|celebrities|famous|star|public figure)\b/ },
   { id: "anxiety", re: /\b(scared|afraid|anxious|anxiety|nervous|fear|phobia|pain|hurt|painful|comfortable)\b/ },
   { id: "travel", re: /\b(out of state|travel|airport|fly|flying|jfk|laguardia|newark|hotel|international)\b/ },
   { id: "reviews", re: /\b(review|reviews|rating|rated|testimonial|google)\b/ },
@@ -140,11 +140,11 @@ function localAnswer(raw) {
     const n = nycNow();
     return botSay(`${n.office ? "Our team is in the office right now, so you can call [212-751-5665](tel:2127515665) for an instant answer." : "The office is closed at the moment, but I'm here 24/7 and can take your details so a coordinator calls you first thing."}\n\nWe see patients **by appointment**, and the coordinator confirms exact times when you book.`, { chips: ["Book a free consultation", "Request a call back"] });
   }
-  if (hit === "doctors" && !svc) return botSay(`You'd be in wonderful hands:\n- **Dr. Mojgan Fajiram, DDS**: founder, 30+ years in cosmetic dentistry, RealSelf Top Doctor and the go-to for celebrity smiles.\n- **Dr. Sheila Monahemi, DDS**: general & cosmetic dentist known for beautifully natural veneers.`, { chips: ["Veneers", "See before & after", "Book with Dr. Fajiram"] });
-  if (hit === "celeb") return botSay(`Our patients have included **${P.celebrities.slice(0, 8).join(", ")}** and many more. Every patient gets the same red-carpet care, and full discretion.`, { chips: ["See before & after", "Smile makeover", "Book a consultation"] });
+  if (hit === "doctors" && !svc) return botSay(`You'd be in wonderful hands:\n- **Dr. Mojgan Fajiram, DDS**: founder, 30+ years in cosmetic dentistry, award-winning and a go-to for camera-ready smiles.\n- **Dr. Sheila Monahemi, DDS**: general & cosmetic dentist known for beautifully natural veneers.`, { chips: ["Veneers", "See before & after", "Book with Dr. Fajiram"] });
+  if (hit === "celeb") return botSay(`Our patients include public figures, executives and New Yorkers from all walks of life. Every patient gets the same red-carpet care, and **complete discretion**: we never share who we treat.`, { chips: ["See before & after", "Smile makeover", "Book a consultation"] });
   if (hit === "anxiety" && !svc) return botSay(`You're not alone, and many of our patients felt the same. We use **pain-free techniques**, take things at your pace and offer comfort options. The office is calm and spa-like, so even nervous patients tell us they look forward to visits.`, { chips: ["Sedation options", "Book a gentle consult"] });
   if (hit === "travel") return botSay(`We welcome patients from all over. From LaGuardia it's about **15 min** by car, and about **30 min** from JFK or Newark. Thanks to our **on-site lab**, many treatments can be completed in very few visits, which is ideal if you're flying in.`, { chips: ["One-visit dentistry", "Book a consultation"] });
-  if (hit === "reviews") return botSay(`We're rated **4.9★ from about 236 Google reviews**. One patient wrote: *“My dentist for life. I would literally never go anywhere else.”*`, { chips: ["See reviews", "Book a consultation"] });
+  if (hit === "reviews") return botSay(`We're rated **4.9★ from about 236 Google reviews**. Patients often mention how natural their results look and how calm and pain-free their visits feel.`, { chips: ["See reviews", "Book a consultation"] });
   if (hit === "results") { document.querySelector("#results")?.scrollIntoView({ behavior: "smooth" }); return botSay(`I've scrolled you to our **before & after** gallery. Drag the slider to compare real patients.`, { chips: ["Veneers", "Smile makeover", "Book a consultation"] }); }
   if (svc) {
     const extra = hit === "duration" && /veneer/.test(svc.name.toLowerCase()) ? "\n\nWith good care (regular cleanings, and a night guard if you grind), porcelain veneers commonly last **10–15+ years**." : "";

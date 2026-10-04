@@ -8,6 +8,8 @@
 //   GOOGLE_PLACES_API_KEY  Google Places API (New) key
 //   GOOGLE_PLACE_ID        Place ID for the practice
 //   ANTHROPIC_API_KEY      enables the Claude-backed AI concierge
+//   BLOG_LIVE=1            pull posts from the practice's WordPress (off by default in the demo)
+//   DEMO_EXPIRES           YYYY-MM-DD; after this date the site shows an "expired" page
 
 import http from "node:http";
 import fs from "node:fs";
@@ -20,6 +22,8 @@ const ROOT = path.dirname(fileURLToPath(import.meta.url));
 const PUBLIC = path.join(ROOT, "public");
 const DATA = path.join(ROOT, "data");
 const PORT = Number(process.env.PORT) || 5173;
+const DEMO_EXPIRES = process.env.DEMO_EXPIRES || "2026-11-03";
+const isExpired = () => Date.now() > new Date(DEMO_EXPIRES + "T23:59:59-05:00").getTime(); // end of day, New York
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -77,7 +81,8 @@ async function getYouTube() {
       // Curated press clips first (the RSS feed only exposes the 15 latest uploads).
       const fb = await readJSON("youtube.fallback.json");
       const seen = new Set();
-      const merged = [...fb.videos, ...videos].filter((v) => v.id && !seen.has(v.id) && seen.add(v.id));
+      const exclude = /fat joe/i; // videos featuring public figures are left out of the demo
+      const merged = [...fb.videos, ...videos].filter((v) => v.id && !exclude.test(v.title) && !seen.has(v.id) && seen.add(v.id));
       return { source: "live", channelUrl: fb.channelUrl, videos: merged.slice(0, 9) };
     } catch (err) {
       console.warn("[youtube] falling back:", err.message);
@@ -164,6 +169,7 @@ async function getReviews() {
 
 // Blog: the practice's existing WordPress REST API — publishes there show up here automatically.
 async function getBlog() {
+  if (process.env.BLOG_LIVE !== "1") return readJSON("blog.fallback.json");
   return cached("blog", HOUR, async () => {
     try {
       const r = await fetchWithTimeout(
@@ -339,8 +345,17 @@ async function serveStatic(req, res, urlPath) {
   });
 }
 
+const EXPIRED_PAGE = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+<title>Demo expired</title><style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#14110e;color:#f6f2eb;font:16px/1.6 system-ui,sans-serif;text-align:center;padding:24px}
+h1{font:400 2.4rem Georgia,serif;margin:0 0 12px}p{color:rgba(246,242,235,.65);max-width:460px;margin:0 auto}span{color:#d8bb8a}</style></head>
+<body><div><h1>This demo has <span>expired</span></h1><p>This was a temporary concept preview and is no longer available. It was never the official website of Sutton Advanced Cosmetic Dentistry.</p></div></body></html>`;
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, "http://localhost");
+  if (isExpired()) {
+    if (url.pathname.startsWith("/api/")) return json(req, res, 410, { error: "demo expired" });
+    return send(req, res, 410, EXPIRED_PAGE, MIME[".html"], { "Cache-Control": "no-store" });
+  }
   try {
     if (url.pathname.startsWith("/api/")) {
       if (req.method === "GET") {
@@ -350,10 +365,11 @@ const server = http.createServer(async (req, res) => {
         if (url.pathname === "/api/status") {
           return json(req, res, 200, {
             youtube: "live (public RSS)",
-            blog: "live (WordPress REST)",
+            blog: process.env.BLOG_LIVE === "1" ? "live (WordPress REST)" : "demo data",
             instagram: process.env.IG_ACCESS_TOKEN ? "live" : "demo data",
-            reviews: process.env.GOOGLE_PLACES_API_KEY && process.env.GOOGLE_PLACE_ID ? "live" : "fallback",
+            reviews: process.env.GOOGLE_PLACES_API_KEY && process.env.GOOGLE_PLACE_ID ? "live" : "demo data",
             assistant: process.env.ANTHROPIC_API_KEY ? "claude" : "local",
+            demoExpires: DEMO_EXPIRES,
           });
         }
       }
@@ -373,7 +389,7 @@ const server = http.createServer(async (req, res) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`\n  Sutton demo running →  http://localhost:${PORT}\n`);
+  console.log(`\n  Sutton demo running →  http://localhost:${PORT}   (demo expires ${DEMO_EXPIRES})\n`);
   // Warm the upstream caches so the first visitor gets instant sections.
-  Promise.allSettled([getYouTube(), getBlog()]);
+  Promise.allSettled([getYouTube()]);
 });

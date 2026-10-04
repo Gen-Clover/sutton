@@ -5,7 +5,6 @@ import { closeOtherPanels } from "./assistant.js";
 
 const $ = (s, el = document) => el.querySelector(s);
 const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
-const WA_NUMBER = "13476575525"; // practice mobile listed on the contact page; confirm before go-live
 const now = () => new Date().toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -39,7 +38,6 @@ async function send(text) {
   text = text.trim();
   if (!text) return;
   bubble(text, "out");
-  $("#waOpen").href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(text)}`;
   const r = REPLIES.find((x) => x.re.test(text));
   await reply(r ? r.text : "Thanks for your message! 🙏 A member of our team will reply here shortly. For anything urgent, call 212-751-5665.");
 }
@@ -54,7 +52,6 @@ function start() {
 export function initWhatsApp() {
   panel = $("#waPanel"); body = $("#waBody"); input = $("#waText"); quickEl = $("#waQuick");
   quickEl.innerHTML = QUICK.map((q) => `<button type="button">${q}</button>`).join("");
-  $("#waOpen").href = `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent("Hi! I'd like to book a consultation.")}`;
 
   $("#waFab").addEventListener("click", () => {
     const opening = panel.hidden;

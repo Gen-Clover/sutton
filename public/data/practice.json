@@ -13,7 +13,7 @@
   "doctors": [
     {
       "name": "Dr. Mojgan Fajiram, DDS",
-      "bio": "Founder. 30+ years of experience; one of NYC's leading cosmetic dentists. Celebrity, executive and international clientele. RealSelf Top Doctor. Tony Award winner as a co-producer of Broadway's 'Once on This Island'. Featured on FOX 5, Vogue, GQ, New Beauty, TMZ and more."
+      "bio": "Founder. 30+ years of experience; one of NYC's leading cosmetic dentists, trusted by public figures, executives and international patients. Frequently featured in TV and magazine interviews on cosmetic dentistry."
     },
     {
       "name": "Dr. Sheila Monahemi, DDS",
@@ -26,24 +26,72 @@
     "Pain-free techniques and a calm, spa-like office; anxious patients welcome",
     "Every smile is designed for the individual face, not a generic set of teeth"
   ],
-  "celebrities": ["Shania Twain", "Idris Elba", "Nicki Minaj", "Fat Joe", "Eve", "Ashanti", "Trina", "Swizz Beatz", "Fabolous", "Fetty Wap", "DJ Khaled", "Angie Martinez", "Sunny Anderson", "DJ Enuff"],
   "services": [
-    { "name": "Porcelain Veneers", "summary": "Ultra-thin, custom ceramic shells that correct chips, gaps, stains and shape. Hand-crafted in the on-site lab; stain-resistant and natural-looking." },
-    { "name": "Smile Makeover", "summary": "A fully customised plan combining veneers, whitening, bonding or crowns, designed around your facial features." },
-    { "name": "Dental Implants", "summary": "Natural-looking replacement for missing teeth that preserves bone and does not alter neighbouring teeth." },
-    { "name": "All-on-X / All-on-6", "summary": "A full fixed arch of teeth supported by implants, for patients missing most or all of their teeth." },
-    { "name": "Laser Teeth Whitening", "summary": "In-office whitening with professional gels and gum protection for fast, dramatic results with minimal sensitivity." },
-    { "name": "Invisalign", "summary": "Clear aligners to straighten teeth discreetly." },
-    { "name": "Porcelain Crowns", "summary": "Strong, lifelike crowns, often milled and placed in a single visit." },
-    { "name": "One-Visit Dentistry (CEREC)", "summary": "Digital scan, design and milling on-site so crowns and restorations can be completed the same day." },
-    { "name": "Teeth Bonding", "summary": "Tooth-coloured resin to repair small chips and gaps quickly." },
-    { "name": "Inlays & Onlays", "summary": "Conservative porcelain restorations that preserve more natural tooth structure than crowns." },
-    { "name": "Dental Bridges", "summary": "Fixed replacement for one or more missing teeth." },
-    { "name": "Full Mouth Reconstruction", "summary": "Comprehensive rebuilding of function and aesthetics across the whole mouth." },
-    { "name": "TMJ Treatment", "summary": "Relief for jaw pain, clicking and clenching." },
-    { "name": "Sleep Apnea Screening", "summary": "Screening and oral-appliance options for snoring and sleep apnea." },
-    { "name": "Professional Cleanings", "summary": "Gentle hygiene visits with experienced hygienists." },
-    { "name": "Pain-Free Dentistry", "summary": "Comfort-first techniques and sedation options for anxious patients." }
+    {
+      "name": "Porcelain Veneers",
+      "summary": "Ultra-thin, custom ceramic shells that correct chips, gaps, stains and shape. Hand-crafted in the on-site lab; stain-resistant and natural-looking."
+    },
+    {
+      "name": "Smile Makeover",
+      "summary": "A fully customised plan combining veneers, whitening, bonding or crowns, designed around your facial features."
+    },
+    {
+      "name": "Dental Implants",
+      "summary": "Natural-looking replacement for missing teeth that preserves bone and does not alter neighbouring teeth."
+    },
+    {
+      "name": "All-on-X / All-on-6",
+      "summary": "A full fixed arch of teeth supported by implants, for patients missing most or all of their teeth."
+    },
+    {
+      "name": "Laser Teeth Whitening",
+      "summary": "In-office whitening with professional gels and gum protection for fast, dramatic results with minimal sensitivity."
+    },
+    {
+      "name": "Invisalign",
+      "summary": "Clear aligners to straighten teeth discreetly."
+    },
+    {
+      "name": "Porcelain Crowns",
+      "summary": "Strong, lifelike crowns, often milled and placed in a single visit."
+    },
+    {
+      "name": "One-Visit Dentistry (CEREC)",
+      "summary": "Digital scan, design and milling on-site so crowns and restorations can be completed the same day."
+    },
+    {
+      "name": "Teeth Bonding",
+      "summary": "Tooth-coloured resin to repair small chips and gaps quickly."
+    },
+    {
+      "name": "Inlays & Onlays",
+      "summary": "Conservative porcelain restorations that preserve more natural tooth structure than crowns."
+    },
+    {
+      "name": "Dental Bridges",
+      "summary": "Fixed replacement for one or more missing teeth."
+    },
+    {
+      "name": "Full Mouth Reconstruction",
+      "summary": "Comprehensive rebuilding of function and aesthetics across the whole mouth."
+    },
+    {
+      "name": "TMJ Treatment",
+      "summary": "Relief for jaw pain, clicking and clenching."
+    },
+    {
+      "name": "Sleep Apnea Screening",
+      "summary": "Screening and oral-appliance options for snoring and sleep apnea."
+    },
+    {
+      "name": "Professional Cleanings",
+      "summary": "Gentle hygiene visits with experienced hygienists."
+    },
+    {
+      "name": "Pain-Free Dentistry",
+      "summary": "Comfort-first techniques and sedation options for anxious patients."
+    }
   ],
-  "travel": "Out-of-state patients: LaGuardia is 8 miles (about 15 min by car), JFK 16 miles (about 30 min), Newark 17 miles (about 30 min)."
+  "travel": "Out-of-state patients: LaGuardia is 8 miles (about 15 min by car), JFK 16 miles (about 30 min), Newark 17 miles (about 30 min).",
+  "clientele": "Public figures, executives, New Yorkers and international patients. Patient identities are kept strictly private."
 }

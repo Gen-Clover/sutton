@@ -9,17 +9,30 @@ const getJSON = (url) => fetch(url).then((r) => (r.ok ? r.json() : Promise.rejec
 
 /* ---------------- services data (tile deck) ---------------- */
 export const SERVICES = [
-  { name: "Porcelain Veneers", sub: "Handcrafted in our on-site lab", img: "/img/blog/how-porcelain-veneers-are-made-for-natural-smiles.webp" },
-  { name: "Smile Makeover", sub: "Designed around your face", img: "/img/ba/ba3.webp" },
-  { name: "Dental Implants", sub: "Natural, permanent, bone-preserving", img: "/img/blog/how-to-choose-implant-material-for-a-natural-smile.webp" },
-  { name: "Laser Teeth Whitening", sub: "Dramatic results in one visit", img: "/img/ba/ba1.webp" },
-  { name: "One-Visit Dentistry (CEREC)", short: "One-Visit Crowns", sub: "Scan, mill and fit the same day", img: "/img/blog/how-one-visit-crowns-work-for-a-faster-smile.webp" },
-  { name: "Invisalign", sub: "Discreet clear aligners", img: "/img/ba/ba7.webp" },
-  { name: "Teeth Bonding", sub: "Quick fixes for chips & gaps", img: "/img/blog/dental-bonding-versus-crowns-for-a-better-smile.webp" },
-  { name: "Pain-Free Dentistry", sub: "Comfort-first, anxiety-friendly", img: "/img/blog/sedation-dentistry-versus-nitrous-oxide.webp" },
+  { name: "Porcelain Veneers", sub: "Handcrafted in our on-site lab", img: "/img/demo/svc-veneers.webp" },
+  { name: "Smile Makeover", sub: "Designed around your face", img: "/img/demo/svc-makeover.webp" },
+  { name: "Dental Implants", sub: "Natural, permanent, bone-preserving", img: "/img/demo/svc-implants.webp" },
+  { name: "Laser Teeth Whitening", sub: "Dramatic results in one visit", img: "/img/demo/svc-whitening.webp" },
+  { name: "One-Visit Dentistry (CEREC)", short: "One-Visit Crowns", sub: "Scan, mill and fit the same day", img: "/img/demo/svc-crowns.webp" },
+  { name: "Invisalign", sub: "Discreet clear aligners", img: "/img/demo/svc-invisalign.webp" },
+  { name: "Teeth Bonding", sub: "Quick fixes for chips & gaps", img: "/img/demo/svc-bonding.webp" },
+  { name: "Pain-Free Dentistry", sub: "Comfort-first, anxiety-friendly", img: "/img/demo/svc-painfree.webp" },
 ];
 let practice = null;
 const practiceReady = getJSON("/data/practice.json").then((p) => (practice = p));
+
+/* ---------------- demo banner ---------------- */
+const banner = $("#demoBanner");
+const syncBanner = () => document.documentElement.style.setProperty("--bh", banner.offsetHeight + "px");
+syncBanner();
+addEventListener("resize", syncBanner, { passive: true });
+getJSON("/api/status").then((s) => {
+  if (!s.demoExpires) return;
+  const d = new Date(s.demoExpires + "T23:59:59");
+  const days = Math.max(0, Math.ceil((d - Date.now()) / 864e5));
+  $("#demoExpiry").innerHTML = `will expire on <b>${d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</b> (${days} day${days === 1 ? "" : "s"} left)`;
+  syncBanner();
+}).catch(() => {});
 
 /* ---------------- nav ---------------- */
 const nav = $("#nav");
@@ -42,9 +55,8 @@ const io = new IntersectionObserver((entries) => {
 const observe = (root = document) => $$(".reveal:not(.in)", root).forEach((el) => io.observe(el));
 observe();
 
-/* ---------------- celeb marquee ---------------- */
-const celebs = ["nicki-minaj", "idris", "shania-twain", "fj2", "eve", "ashanti", "trina", "sw", "djfhaled2", "fetty-wap", "angie-martinez", "sunny-anderson", "dj-enuff", "lil2", "fb-1", "emily-bustamante", "lorena-cartagena", "lac", "andrea-martin", "merle-louise"];
-const celebHTML = celebs.map((c) => `<img src="/img/celeb/${c}.webp" alt="" width="78" height="78" loading="lazy" decoding="async">`).join("");
+/* ---------------- client avatars (illustrative, no real identities) ---------------- */
+const celebHTML = Array.from({ length: 16 }, (_, i) => `<img src="/img/demo/avatar-${i + 1}.webp" alt="" width="78" height="78" loading="lazy" decoding="async">`).join("");
 $("#celebTrack").innerHTML = celebHTML + celebHTML; // duplicated for a seamless loop
 
 /* ---------------- services deck ---------------- */
@@ -92,7 +104,7 @@ document.addEventListener("click", (e) => {
   const tile = SERVICES.find((s) => s.name === name);
   $("#svcTitle").textContent = name;
   $("#svcText").textContent = (info?.summary || "") + " Every plan begins with a complimentary, in-person consultation with Dr. Fajiram or Dr. Monahemi.";
-  $("#svcImg").src = tile?.img || "/img/office.webp";
+  $("#svcImg").src = tile?.img || "/img/demo/svc-makeover.webp";
   $("#svcImg").alt = name;
   modal.dataset.svc = name;
   modal.showModal();
@@ -108,20 +120,18 @@ $("#svcAsk").addEventListener("click", () => {
   openAssistant(`Tell me about ${modal.dataset.svc}`);
 });
 
-/* ---------------- before / after ---------------- */
-// o: how the before/after composite is laid out (lr = side by side, tb = stacked)
-const BA = [["ba3", "lr"], ["ba1", "lr"], ["ba7", "tb"], ["ba2", "lr"], ["ba5", "tb"], ["ba8", "tb"], ["ba6", "tb"], ["ba4", "lr"]];
+/* ---------------- before / after (illustrations for the demo) ---------------- */
+const BA = [1, 2, 3, 4, 5, 6];
 const ba = $("#ba"), baRange = $("#baRange");
-function setBA(id) {
-  ba.dataset.o = BA.find(([x]) => x === id)[1];
-  const url = `url(/img/ba/${id}.webp)`;
-  $$(".ba-img", ba).forEach((el) => (el.style.backgroundImage = url));
-  $$("#baThumbs button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.id === id));
+function setBA(n) {
+  $(".ba-before", ba).style.backgroundImage = `url(/img/demo/smile-${n}-before.webp)`;
+  $(".ba-after", ba).style.backgroundImage = `url(/img/demo/smile-${n}-after.webp)`;
+  $$("#baThumbs button").forEach((b) => b.setAttribute("aria-pressed", +b.dataset.id === n));
 }
-$("#baThumbs").innerHTML = BA.map(([id], i) => `<button data-id="${id}" aria-label="Show smile ${i + 1}" aria-pressed="false"><img src="/img/ba/${id}.webp" alt="" loading="lazy" decoding="async"></button>`).join("");
-$("#baThumbs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) setBA(b.dataset.id); });
+$("#baThumbs").innerHTML = BA.map((n) => `<button data-id="${n}" aria-label="Show example ${n}" aria-pressed="false"><img src="/img/demo/smile-${n}-before.webp" alt="" loading="lazy" decoding="async"></button>`).join("");
+$("#baThumbs").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) setBA(+b.dataset.id); });
 baRange.addEventListener("input", () => ba.style.setProperty("--pos", baRange.value + "%"));
-setBA(BA[0][0]);
+setBA(BA[0]);
 // gentle "hint" sweep the first time the slider scrolls into view
 new IntersectionObserver(([e], obs) => {
   if (!e.isIntersecting) return;
@@ -225,7 +235,7 @@ getJSON("/api/reviews").then((d) => {
       <div class="rv-who">${r.photo ? `<img class="rv-av" src="${esc(r.photo)}" alt="" loading="lazy">` : `<span class="rv-av">${esc(r.author?.[0] || "G")}</span>`}
         <div><strong>${esc(r.author)}</strong><small>${esc(r.when)}</small></div></div>
     </article>`).join("");
-  badge($("#rvSync"), d.source, "Live · Google Places API", "Showing published reviews · goes live via Google API");
+  badge($("#rvSync"), d.source, "Live · Google Places API", "Demo reviews · real Google reviews sync at launch");
 }).catch(() => {});
 $(".rv-nav").addEventListener("click", (e) => {
   const b = e.target.closest("[data-rv]");
@@ -237,7 +247,7 @@ $(".rv-nav").addEventListener("click", (e) => {
 /* ---------------- Blog (live WordPress) ---------------- */
 getJSON("/api/blog").then((d) => {
   $("#blogGrid").innerHTML = d.posts.slice(0, 6).map((p) => `
-    <a class="post reveal" href="${esc(p.link)}" target="_blank" rel="noopener">
+    <a class="post reveal" href="${esc(p.link)}"${p.link.startsWith("http") ? ' target="_blank" rel="noopener"' : ""}>
       <div class="post-img">${p.image ? `<img src="${esc(p.image)}" alt="" loading="lazy" decoding="async">` : ""}</div>
       <div class="post-body">
         <time datetime="${esc(p.date)}">${new Date(p.date).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</time>
@@ -247,7 +257,7 @@ getJSON("/api/blog").then((d) => {
       </div>
     </a>`).join("");
   observe($("#blogGrid"));
-  badge($("#blogSync"), d.source, "Live · auto-published from your blog", "Latest articles");
+  badge($("#blogSync"), d.source, "Live · auto-published from your blog", "Demo articles · your blog syncs automatically at launch");
 }).catch(() => {});
 
 /* ---------------- lazy map ---------------- */
