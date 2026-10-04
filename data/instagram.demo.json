@@ -1,0 +1,23 @@
+{
+  "source": "demo",
+  "profile": {
+    "username": "dr.mojgandds",
+    "name": "Dr. Mojgan Fajiram, DDS",
+    "bio": "Celebrity cosmetic dentist · NYC\nPorcelain veneers · Smile makeovers · Implants\n📍 400 E 56th St, Manhattan",
+    "avatar": "/img/doctors.webp",
+    "posts": 1284,
+    "followers": 48600,
+    "following": 912,
+    "url": "https://www.instagram.com/dr.mojgandds/"
+  },
+  "media": [
+    { "id": "d1", "type": "IMAGE", "image": "/img/ba/ba3.webp", "caption": "20 hand-crafted porcelain veneers. Same face, a whole new confidence ✨ #smilemakeover #veneersnyc", "likes": 1840, "comments": 96 },
+    { "id": "d2", "type": "VIDEO", "image": "/img/ba/ba1.webp", "caption": "Before → after. Subtle, natural, still him. That's the goal every time.", "likes": 2210, "comments": 141 },
+    { "id": "d3", "type": "IMAGE", "image": "/img/office.webp", "caption": "Your calm place in Midtown East. Come say hi 🤍", "likes": 640, "comments": 22 },
+    { "id": "d4", "type": "IMAGE", "image": "/img/ba/ba7.webp", "caption": "Closing gaps, brightening shade, keeping it natural. #porcelainveneers", "likes": 1532, "comments": 74 },
+    { "id": "d5", "type": "VIDEO", "image": "/img/doctors.webp", "caption": "Dr. Fajiram & Dr. Monahemi — the team behind NYC's celebrity smiles.", "likes": 980, "comments": 58 },
+    { "id": "d6", "type": "IMAGE", "image": "/img/ba/ba5.webp", "caption": "One visit. On-site lab. Walk out smiling.", "likes": 1105, "comments": 39 },
+    { "id": "d7", "type": "IMAGE", "image": "/img/ba/ba2.webp", "caption": "Full smile makeover, designed for her face — not a generic set of teeth.", "likes": 1720, "comments": 88 },
+    { "id": "d8", "type": "IMAGE", "image": "/img/ba/ba8.webp", "caption": "Bright, balanced, believable. #cosmeticdentistnyc", "likes": 1298, "comments": 61 }
+  ]
+}

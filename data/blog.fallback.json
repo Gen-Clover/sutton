@@ -1,0 +1,11 @@
+{
+  "source": "fallback",
+  "posts": [
+    { "id": 1, "date": "2026-10-03", "link": "https://www.suttonplacecosmeticdentist.com/dental-bonding-versus-crowns", "title": "Dental Bonding Versus Crowns for a Better Smile", "excerpt": "Compare aesthetics, durability, timing, and cost factors to choose a refined, natural-looking smile result.", "image": "/img/blog/dental-bonding-versus-crowns-for-a-better-smile.webp" },
+    { "id": 2, "date": "2026-10-01", "link": "https://www.suttonplacecosmeticdentist.com/sedation-dentistry-versus-nitrous-oxide", "title": "Sedation Dentistry Versus Nitrous Oxide", "excerpt": "Compare sedation dentistry versus nitrous oxide for comfort, recovery, and control.", "image": "/img/blog/sedation-dentistry-versus-nitrous-oxide.webp" },
+    { "id": 3, "date": "2026-09-29", "link": "https://www.suttonplacecosmeticdentist.com/how-to-choose-implant-material", "title": "How to Choose Implant Material for a Natural Smile", "excerpt": "Learn how to choose implant material for strength, comfort, and a natural-looking result.", "image": "/img/blog/how-to-choose-implant-material-for-a-natural-smile.webp" },
+    { "id": 4, "date": "2026-09-27", "link": "https://www.suttonplacecosmeticdentist.com/how-one-visit-crowns-work", "title": "How One Visit Crowns Work for a Faster Smile", "excerpt": "From digital scans to precision-milled ceramic — see who may qualify for a same-day restoration.", "image": "/img/blog/how-one-visit-crowns-work-for-a-faster-smile.webp" },
+    { "id": 5, "date": "2026-08-24", "link": "https://www.suttonplacecosmeticdentist.com/why-do-veneers-look-fake", "title": "Why Do Veneers Look Fake? How to Avoid It", "excerpt": "How shade, shape, proportions, and expert planning create a polished, natural-looking smile.", "image": "/img/blog/why-do-veneers-look-fake-how-to-avoid-it.webp" },
+    { "id": 6, "date": "2026-09-01", "link": "https://www.suttonplacecosmeticdentist.com/how-porcelain-veneers-are-made", "title": "How Porcelain Veneers Are Made for Natural Smiles", "excerpt": "From digital smile design to hand-finished ceramic — why precise planning creates a refined result.", "image": "/img/blog/how-porcelain-veneers-are-made-for-natural-smiles.webp" }
+  ]
+}

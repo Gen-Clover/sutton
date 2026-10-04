@@ -1,0 +1,17 @@
+{
+  "name": "sutton-demo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Demo website for Sutton Advanced Cosmetic Dentistry",
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "dev": "node --env-file-if-exists=.env --watch server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "optionalDependencies": {
+    "@anthropic-ai/sdk": "latest"
+  }
+}
