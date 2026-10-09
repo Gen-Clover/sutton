@@ -500,6 +500,11 @@ export async function handleRequest(req, res) {
     json(req, res, 500, { error: "server error" });
   }
 }
+// Also export as default: Vercel's build has been observed resolving the
+// function entry back to this bundled file (as server.mjs) rather than
+// api/index.js's re-export, which failed with "the default export must be
+// a function" when this file only had the named export above.
+export default handleRequest;
 
 // Only start a persistent listener when this file is run directly
 // (`node server.js` / `npm start` / `npm run dev`), never when it's imported
