@@ -1,9 +1,9 @@
-// Regenerates the original placeholder artwork in public/img/demo (no real people, no third-party art).
+// Regenerates the original placeholder artwork in site/img/demo (no real people, no third-party art).
 // Run: npm i --no-save sharp && node tools/generate-demo-art.cjs
 const sharp = require("sharp");
 const fs = require("fs");
 const path = require("path");
-const OUT = path.join(__dirname, "..", "public", "img");
+const OUT = path.join(__dirname, "..", "site", "img");
 const GOLD = "#d8bb8a", GOLD2 = "#b8925a", INK = "#14110e", IVORY = "#f6f2eb";
 
 async function render(svg, file, width) {

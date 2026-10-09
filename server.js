@@ -22,8 +22,9 @@ import { fileURLToPath } from "node:url";
 import crypto from "node:crypto";
 
 const ROOT = path.dirname(fileURLToPath(import.meta.url));
-const PUBLIC = path.join(ROOT, "public");
+const PUBLIC = path.join(ROOT, "site");
 const DATA = path.join(ROOT, "data");
+const ON_VERCEL = !!process.env.VERCEL;
 const PORT = Number(process.env.PORT) || 5173;
 const DEMO_EXPIRES = process.env.DEMO_EXPIRES || "2026-11-03";
 const isExpired = () => Date.now() > new Date(DEMO_EXPIRES + "T23:59:59-05:00").getTime(); // end of day, New York
@@ -276,12 +277,19 @@ async function saveLead(body) {
     message: String(body.message || "").slice(0, 2000),
   };
   if (!lead.name || !(lead.phone || lead.email)) return { status: 400, data: { error: "Name and phone or email are required." } };
-  const file = path.join(DATA, "leads.json");
-  let leads = [];
-  try { leads = JSON.parse(await fsp.readFile(file, "utf8")); } catch {}
-  leads.push(lead);
-  await fsp.writeFile(file, JSON.stringify(leads, null, 2));
-  console.log(`[lead] ${lead.channel}: ${lead.name} ${lead.phone || lead.email} — ${lead.service}`);
+  // Always log first: on Vercel the filesystem is read-only (except /tmp, which is
+  // ephemeral and not shared across instances), so the function log is the one
+  // durable record there until this is wired to email/CRM/a database.
+  console.log(`[lead] ${lead.channel}: ${lead.name} ${lead.phone || lead.email} — ${lead.service} :: ${JSON.stringify(lead)}`);
+  const file = path.join(ON_VERCEL ? "/tmp" : DATA, "leads.json");
+  try {
+    let leads = [];
+    try { leads = JSON.parse(await fsp.readFile(file, "utf8")); } catch {}
+    leads.push(lead);
+    await fsp.writeFile(file, JSON.stringify(leads, null, 2));
+  } catch (err) {
+    console.warn("[lead] could not persist to disk (non-fatal):", err.message);
+  }
   return { status: 200, data: { ok: true } };
 }
 
@@ -442,7 +450,10 @@ async function gatePage() {
 </html>`;
 }
 
-const server = http.createServer(async (req, res) => {
+// The actual request handler. Reused as-is by both the local `http.createServer`
+// listener below and the Vercel serverless function in api/index.js, so the
+// routing, the gate and every route behave identically on both.
+export async function handleRequest(req, res) {
   const url = new URL(req.url, "http://localhost");
   if (isExpired()) {
     if (url.pathname.startsWith("/api/")) return json(req, res, 410, { error: "demo expired" });
@@ -486,10 +497,15 @@ const server = http.createServer(async (req, res) => {
     console.error(err);
     json(req, res, 500, { error: "server error" });
   }
-});
+}
 
-server.listen(PORT, () => {
-  console.log(`\n  Sutton demo running →  http://localhost:${PORT}   (demo expires ${DEMO_EXPIRES})\n`);
-  // Warm the upstream caches so the first visitor gets instant sections.
-  Promise.allSettled([getYouTube()]);
-});
+// Only start a persistent listener for local dev / a normal Node host.
+// On Vercel, api/index.js imports handleRequest directly — there is no
+// long-running process, so .listen() is never called there.
+if (!ON_VERCEL) {
+  http.createServer(handleRequest).listen(PORT, () => {
+    console.log(`\n  Sutton demo running →  http://localhost:${PORT}   (demo expires ${DEMO_EXPIRES})\n`);
+    // Warm the upstream caches so the first visitor gets instant sections.
+    Promise.allSettled([getYouTube()]);
+  });
+}

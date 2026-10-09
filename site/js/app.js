@@ -26,13 +26,6 @@ const banner = $("#demoBanner");
 const syncBanner = () => document.documentElement.style.setProperty("--bh", banner.offsetHeight + "px");
 syncBanner();
 addEventListener("resize", syncBanner, { passive: true });
-getJSON("/api/status").then((s) => {
-  if (!s.demoExpires) return;
-  const d = new Date(s.demoExpires + "T23:59:59");
-  const days = Math.max(0, Math.ceil((d - Date.now()) / 864e5));
-  $("#demoExpiry").innerHTML = `will expire on <b>${d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</b> (${days} day${days === 1 ? "" : "s"} left)`;
-  syncBanner();
-}).catch(() => {});
 
 /* ---------------- nav ---------------- */
 const nav = $("#nav");
