@@ -398,7 +398,9 @@ function rateLimited(ip) {
   return ++a.n > 10;
 }
 async function unlock(req, res) {
-  const ip = req.socket.remoteAddress || "?";
+  // req.socket may be absent on some serverless runtimes; x-forwarded-for is
+  // set by Vercel's proxy and is the more reliable source there anyway.
+  const ip = (req.headers["x-forwarded-for"] || "").split(",")[0].trim() || req.socket?.remoteAddress || "?";
   if (rateLimited(ip)) return json(req, res, 429, { error: "Too many attempts. Please try again in 15 minutes." });
   const { email, password } = await readBody(req);
   if (!checkCredentials(email, password)) return json(req, res, 401, { error: "Incorrect email or password." });
@@ -499,10 +501,15 @@ export async function handleRequest(req, res) {
   }
 }
 
-// Only start a persistent listener for local dev / a normal Node host.
-// On Vercel, api/index.js imports handleRequest directly — there is no
-// long-running process, so .listen() is never called there.
-if (!ON_VERCEL) {
+// Only start a persistent listener when this file is run directly
+// (`node server.js` / `npm start` / `npm run dev`), never when it's imported
+// as a module — which is what api/index.js does on Vercel. Deliberately not
+// based on process.env.VERCEL: calling .listen() inside a serverless function
+// crashes the whole invocation (FUNCTION_INVOCATION_FAILED on every request,
+// including the homepage), so this must not depend on a platform env var
+// being set/exposed as expected — it's checked structurally instead.
+const isDirectRun = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+if (isDirectRun) {
   http.createServer(handleRequest).listen(PORT, () => {
     console.log(`\n  Sutton demo running →  http://localhost:${PORT}   (demo expires ${DEMO_EXPIRES})\n`);
     // Warm the upstream caches so the first visitor gets instant sections.
