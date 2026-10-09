@@ -456,7 +456,6 @@ async function gatePage() {
 // listener below and the Vercel serverless function in api/index.js, so the
 // routing, the gate and every route behave identically on both.
 export async function handleRequest(req, res) {
-  if (process.env.DEBUG_ROUTES) console.log("[debug]", req.method, req.url, "headers.host=", req.headers.host, "x-forwarded-host=", req.headers["x-forwarded-host"]);
   const url = new URL(req.url, "http://localhost");
   if (isExpired()) {
     if (url.pathname.startsWith("/api/")) return json(req, res, 410, { error: "demo expired" });

@@ -44,8 +44,7 @@ This branch is set up to be safe to share as a cold-outreach demo:
 ```
 server.js              the whole app: exports handleRequest(req, res) + starts
                         a local listener unless process.env.VERCEL is set
-api/index.js            Vercel serverless entry point — re-exports handleRequest
-vercel.json             routes every path to api/index.js; bundles site/ + data/
+vercel.json             builds server.js as the function (outside api/ — see "Deploying to Vercel"); bundles site/ + data/
 data/                  fallback/demo data, plus leads.json (created on first lead, local only)
 site/                  everything served to the browser (renamed from the usual
                         "public" on purpose — see note below)
@@ -62,16 +61,18 @@ tools/                 generate-demo-art.cjs + smile.cjs (placeholder artwork ge
 
 ## Deploying to Vercel
 
-The app is one file (`server.js`) exporting `handleRequest(req, res)` — the same signature `http.createServer` takes. Locally it runs that listener directly; `api/index.js` hands the identical function to Vercel, and `vercel.json` routes every path to it, so the gate, caching and every route behave exactly as they do locally.
+The app is one file (`server.js`) exporting `handleRequest(req, res)` — the same signature `http.createServer` takes, and also its `export default`. Locally, `node server.js` runs that listener directly (only when the file is executed directly, never when imported — see the comment above the `isDirectRun` check). On Vercel, `vercel.json` builds `server.js` itself as the function (via the legacy `builds`/`routes` format, not the `api/` zero-config convention) and routes every path to it, so the gate, caching and every route behave the same as local dev.
+
+> **Why not the `api/` directory convention?** An earlier version put a thin wrapper at `api/index.js` and used a `rewrites` rule pointing every path at it. That collided with Vercel's own native `/api/*` function routing: because the rewrite destination (`/api/index`) was itself a reachable function path, any *original* request path other than the literal root `/` had its `req.url` silently replaced with that destination inside the function — breaking every one of our own `/api/*` routes, including `/api/unlock` itself (confirmed by temporarily logging `req.url` in production). Building `server.js` directly via `builds`/`routes` puts the function at `/server.js`, which can never collide with any path our app defines.
 
 **1. Import the repo**
-In the [Vercel dashboard](https://vercel.com/new), "Add New… → Project", import `Gen-Clover/sutton` from GitHub (grant Vercel access to the private repo if asked). Framework Preset: **Other**. Leave Build/Output/Install commands blank (none are needed).
+In the [Vercel dashboard](https://vercel.com/new), "Add New… → Project", import `Gen-Clover/sutton` from GitHub (grant Vercel access to the private repo if asked). Framework Preset: **Other**. Leave Build/Output/Install commands blank — `vercel.json`'s `builds` entry is authoritative once it's present, so no other config is read.
 
-**2. Set the Git branch to deploy** — important, do this before the first deploy
-In the import screen (or **Project Settings → Git** afterwards), set **Production Branch** to `feature/legal-safe-demo`, not `main`. `main`/`dev` still contain the original real photos from before this branch's clean-up (see `## Demo safety`); only `feature/legal-safe-demo` is safe to expose publicly. Vercel also auto-deploys *every* pushed branch as its own preview URL — so until `main` is cleaned up the same way, avoid pushing new commits to `main`/`dev` on this remote.
+**2. Which branch to deploy**
+`main`, `dev` and `feature/legal-safe-demo` are kept in sync (fast-forwarded together) — any of them is safe to deploy from; none contain the original real photos any more (those are preserved only on `backup/main-pre-merge` / `backup/dev-pre-merge`, which are **not** safe to deploy). Production Branch can stay on whatever Vercel defaults to.
 
 **3. Environment variables** (Project Settings → Environment Variables)
-None are required — the login falls back to `sutton@demo.com` / the password already in this chat, and every integration falls back to demo data. Worth setting for a real pitch:
+None are required — the login falls back to `sutton@demo.com` / the password already shared with you, and every integration falls back to demo data. Worth setting for a real pitch:
 | Variable | Why |
 |---|---|
 | `DEMO_PASS` | Use a password you chose yourself rather than the one baked into the code/this chat history |
@@ -83,6 +84,6 @@ None are required — the login falls back to `sutton@demo.com` / the password a
 
 **Known limitation — leads don't persist on Vercel.** Vercel's filesystem is read-only in production (only `/tmp` is writable, and it's wiped between invocations and not shared across them), so the `data/leads.json` approach that works locally can't survive there. Every submission is still printed to the **Vercel → Project → Logs** tab (searchable by `[lead]`), so nothing is silently lost, but there's no list view. Before this goes in front of a client for real, wire `saveLead()` in `server.js` to an email (e.g. Resend), a webhook (e.g. a Zapier/Make form), or a small database (e.g. Vercel KV/Postgres).
 
-**Moving to `main` / a real domain later.** When the client agrees: merge `feature/legal-safe-demo` into `main` (bringing the placeholder content, banner, expiry and gate along — don't revert to the old `main`), then either flip Production Branch back to `main` or just attach the custom domain to this branch's deployment. Remove or loosen the password gate and the `noindex` meta tag at that point, since they're meant for this private pitch stage only.
+**Debugging a live Vercel deployment.** The Vercel CLI (`npm i -g vercel`, then `vercel login` / `vercel link`) can pull real runtime errors that the browser's generic error page doesn't show: `vercel logs <url>` tails live requests (run it, *then* make the request — it's a live tail, not history), and `vercel project ls` / `vercel inspect <url>` show project and deployment state. That combination is what found and fixed the issue above.
 
 The treatment tiles follow the portfolio deck on unitedofweb.com: overlapping cards with a left shadow. The hovered card lifts by `translateY(-20px)`, the cards after it slide right through the `~` sibling selector, and a gradient progress bar fills from 0 to 100%. All of it is pure CSS.
